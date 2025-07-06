@@ -42,6 +42,11 @@ contract SelfDispatch is SelfVerificationRoot, Ownable {
 
         if (_isEligible(getRevealedDataPacked(proof.pubSignals))) {
             _nullifiers[proof.pubSignals[NULLIFIER_INDEX]] = true;
+            app.sendString(
+                40245,
+                "Eligible dispatch",
+                bytes(0)
+            );
             emit MessageDispatched(address(uint160(proof.pubSignals[USER_IDENTIFIER_INDEX])), claimableAmount);
         } else {
             revert("Not eligible: Age or birthday requirements not met");
@@ -52,7 +57,6 @@ contract SelfDispatch is SelfVerificationRoot, Ownable {
         // Check birthday window eligibility
         // Check age eligibility based on country
         string memory nationality = SelfCircuitLibrary.getNationality(revealedDataPacked);
-        uint256 age = SelfCircuitLibrary.calculateAge(revealedDataPacked);
 
         uint256 minimumAge;
         if (keccak256(abi.encodePacked(country)) == keccak256(abi.encodePacked("USA"))) {
