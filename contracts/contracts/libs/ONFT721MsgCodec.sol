@@ -18,11 +18,11 @@ library ONFT721MsgCodec {
      * @return payload The encoded message payload.
      * @return hasCompose A boolean indicating whether the message payload contains a composed payload.
      */
-    function encode(
-        bytes32 _sendTo,
-        uint256 _tokenId,
-        bytes memory _composeMsg
-    ) internal view returns (bytes memory payload, bool hasCompose) {
+    function encode(bytes32 _sendTo, uint256 _tokenId, bytes memory _composeMsg)
+        internal
+        view
+        returns (bytes memory payload, bool hasCompose)
+    {
         hasCompose = _composeMsg.length > 0;
         payload = hasCompose
             ? abi.encodePacked(_sendTo, _tokenId, addressToBytes32(msg.sender), _composeMsg)

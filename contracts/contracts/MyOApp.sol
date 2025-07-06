@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.22;
 
-import { OApp, Origin, MessagingFee } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
-import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import {OApp, Origin, MessagingFee} from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import {OAppOptionsType3} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import { ONFT721MsgCodec } from "./libs/ONFT721MsgCodec.sol";
-import { IMintable } from "./IMintable.sol";
+import {ONFT721MsgCodec} from "./libs/ONFT721MsgCodec.sol";
+import {IMintable} from "./IMintable.sol";
 
 contract MyOApp is OApp, OAppOptionsType3 {
     using ONFT721MsgCodec for bytes;
@@ -15,14 +15,7 @@ contract MyOApp is OApp, OAppOptionsType3 {
     /// @notice Msg type for sending a string, for use in OAppOptionsType3 as an enforced option
     uint16 public constant SEND = 1;
 
-
-    event Created(
-        bytes32 indexed guid, 
-        uint32 srcEid,
-        address indexed toAddress, 
-        uint256 tokenId 
-    );
-
+    event Created(bytes32 indexed guid, uint32 srcEid, address indexed toAddress, uint256 tokenId);
 
     /// @notice Initialize with Endpoint V2 and owner address
     /// @param _endpoint The local chain's LayerZero Endpoint V2 address
@@ -44,12 +37,11 @@ contract MyOApp is OApp, OAppOptionsType3 {
      * @param _payInLzToken Whether to return fee in ZRO token.
      * @return fee A `MessagingFee` struct containing the calculated gas fee in either the native token or ZRO token.
      */
-    function quoteSendString(
-        uint32 _dstEid,
-        string calldata _string,
-        bytes calldata _options,
-        bool _payInLzToken
-    ) public view returns (MessagingFee memory fee) {
+    function quoteSendString(uint32 _dstEid, string calldata _string, bytes calldata _options, bool _payInLzToken)
+        public
+        view
+        returns (MessagingFee memory fee)
+    {
         bytes memory _message = abi.encode(_string);
         // combineOptions (from OAppOptionsType3) merges enforced options set by the contract owner
         // with any additional execution options provided by the caller
@@ -87,11 +79,7 @@ contract MyOApp is OApp, OAppOptionsType3 {
         //    combineOptions (from OAppOptionsType3) merges enforced options set by the contract owner
         //    with any additional execution options provided by the caller
         _lzSend(
-            _dstEid,
-            _message,
-            combineOptions(_dstEid, SEND, _options),
-            MessagingFee(msg.value, 0),
-            payable(msg.sender)
+            _dstEid, _message, combineOptions(_dstEid, SEND, _options), MessagingFee(msg.value, 0), payable(msg.sender)
         );
     }
 
@@ -114,7 +102,7 @@ contract MyOApp is OApp, OAppOptionsType3 {
         Origin calldata _origin,
         bytes32 _guid,
         bytes calldata _message,
-        address /*_executor*/,
+        address, /*_executor*/
         bytes calldata /*_extraData*/
     ) internal override {
         address token = _message.sendTo().bytes32ToAddress();
@@ -125,17 +113,11 @@ contract MyOApp is OApp, OAppOptionsType3 {
         IMintable mintable = IMintable(token);
         address sender = _origin.sender.bytes32ToAddress();
 
-
         mintable.mint(sender, tokenId);
 
         // 3. (Optional) Trigger further on-chain actions.
         //    e.g., emit an event, mint tokens, call another contract, etc.
         //    emit MessageReceived(_origin.srcEid, _string);
-        emit Created(
-            _guid,
-            _origin.srcEid,
-            sender,
-            tokenId
-        );
+        emit Created(_guid, _origin.srcEid, sender, tokenId);
     }
 }
