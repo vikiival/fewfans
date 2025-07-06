@@ -65,8 +65,15 @@ const config: HardhatUserConfig = {
             accounts,
         },
         'celo-testnet': {
+            chainId: 44787,
             eid: EndpointId.CELO_V2_TESTNET,
             url: process.env.RPC_URL_CELO || 'https://alfajores-forno.celo-testnet.org/',
+            accounts,
+        },
+        celo: {
+            chainId: 42220,
+            eid: EndpointId.CELO_V2_MAINNET,
+            url: process.env.RPC_URL_CELO_MAINNET || 'https://forno.celo.org',
             accounts,
         },
         hardhat: {
